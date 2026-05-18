@@ -1,37 +1,56 @@
-# LUODA-TOKEN 品牌汉化与界面修改 — 总结
+# LUODA-TOKEN 修改总结 (2026-05-19 最终版)
 
-**时间**: 2026-05-19
+## 六项修改任务完成确认
 
-## 完成的6项修改
+### 1. 界面整体汉化 ✅
+- src/app/landing/page.js — 汉化
+- src/app/landing/components/Navigation.js — 汉化
+- src/app/landing/components/GetStarted.js — 汉化
+- src/app/landing/components/HowItWorks.js — 汉化
+- src/app/landing/components/Footer.js — 汉化
+- src/app/landing/components/FlowAnimation.js — 汉化
+- src/app/login/page.js — 登录页标题改为 LUODA-TOKEN，提示文本汉化
 
-### 1. 界面完整汉化
-- `src/i18n/config.js`: `DEFAULT_LOCALE` 从 `"en"` → `"zh-CN"`
-- `src/app/layout.js`: `<html lang="en">` → `<html lang="zh-CN">`，metadata title/description 更新
+### 2. 网站名称改 LUODA-TOKEN ✅
+- src/shared/constants/config.js: APP_CONFIG.name = "LUODA-TOKEN"
+- src/app/layout.js: metadata.title = "LUODA-TOKEN"
+- src/app/manifest.js: name/short_name 改为 "LUODA-TOKEN"
+- src/app/globals.css: 注释从 "9Router palette" 改为 "LUODA-TOKEN palette"
+- src/shared/constants/cliTools.js: 文本中 "9Router" → "LUODA-TOKEN"
+- src/shared/constants/skills.js: REPO "luoda2023/LUODA-token"
 
-### 2. 网站名称 9Router Proxy → LUODA-TOKEN
-- `src/shared/constants/config.js`: APP_CONFIG.name → `"LUODA-TOKEN"`
-- `src/app/layout.js`: metadata title/description 更新
-- `src/app/manifest.js`: name/short_name 更新
-- `src/app/login/page.js`: 登录页标题更新
-- **Landing 页全部组件**: Navigation、FlowAnimation、Footer、GetStarted、HowItWorks、page.js 中所有可见 "9Router" 文本 → "LUODA-TOKEN"
+### 3. 亮色主题蓝色按钮 ✅
+- src/app/globals.css: :root (light mode) brand scale 改为蓝色系
+  - --color-brand-500: #3B82F6 (蓝色)
+  - 完整 brand-50 到 brand-900 蓝色色阶
+  - --color-primary/hover 指向蓝色
+  - 暗色模式保持原橙色不变
+- src/shared/components/Button.js: primary 变体使用 bg-brand-500
 
-### 3. 白亮主题按钮色 → 蓝色
-- `src/app/globals.css` `:root`（亮色模式）品牌色从橙色 `#E56A4A` → 蓝色 `#3B82F6`
-- 涉及：brand-50~900 全系列、shadow-warm/focus、selection、scrollbar、dot-grid-bg、border-glow、ctaGlowPulse 动画
-- `.dark`（暗色模式）保持原有橙色不变
+### 4. README 中文安装说明 ✅
+- README.md: 完整中文安装说明含 1Panel Docker 部署
+- README.zh-CN.md: 中文说明
+- i18n/README.zh-CN.md: 详细中文安装说明+常见问题
+- DOCKER.md: 中文 Docker 说明
 
-### 4. README 说明替换
-- `README.md` 和 `README.zh-CN.md` 全部重写为中文安装说明
+### 5. LOGO 更换 ✅
+- public/token.png 已复制
+- src/shared/components/Sidebar.js: <img src="/token.png" alt="LUODA-TOKEN">
 
-### 5. LOGO 替换
-- `token.png` 从桌面复制到 `public/token.png`
-- `src/shared/components/Sidebar.js`: 左上角图标从 material icon + 渐变背景 → `<img src="/token.png">`
+### 6. 左上角3个圆点删除 ✅
+- src/shared/components/Sidebar.js: Traffic lights 组块已删除
 
-### 6. 删除左上角3个圆点
-- `src/shared/components/Sidebar.js`: 删除 Traffic lights 整个 div 块
+## 额外修改
+- Dockerfile: LABEL 改为 LUODA-TOKEN
+- .github/workflows/docker-publish.yml: 仅推 GHCR (不再推 Docker Hub)
+- 所有 README 中镜像地址改为: ghcr.io/luoda2023/LUODA-token:latest
+- 默认语言改为 zh-CN (src/i18n/config.js)
 
-## 未修改（保留原样）
-- 后端路径引用（`dataDir.js`、`appUpdater.js`、`mitm/` 等）— 属于功能代码，非用户可见
-- GitHub URL（仍指向 `decolua/9router`）— 暂未改
-- 暗色主题保持橙色品牌色
-- Landing 页硬编码的橙色（这是独立暗色主题页面，不受主面板主题影响）
+## Git 提交记录
+1. 品牌汉化: 9Router -> LUODA-TOKEN，亮色主题蓝色按钮，中文README，替换LOGO
+2. README: 添加 1Panel Docker 部署说明
+3. Docker: 镜像名改为 ghcr.io/luoda2023/LUODA-token，更新 CI workflow
+
+## Dev Server
+- 地址: http://localhost:20128
+- 已杀死旧进程并重新启动，加载所有最新修改
