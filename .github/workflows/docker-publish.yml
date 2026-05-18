@@ -1,7 +1,9 @@
-﻿name: Build and Push Docker Image
+name: Build and Push Docker Image
 
 on:
-  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
 
 env:
   GHCR_IMAGE: ghcr.io/${{ github.repository }}
