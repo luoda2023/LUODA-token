@@ -18,22 +18,15 @@ jobs:
 
       - name: Build Docker image
         run: |
+          docker build --progress=plain -t test-image:latest . 2>&1 || true
           docker build -t test-image:latest .
-          docker build -t ghcr.io/luoda2023/LUODA-token:latest .
-          docker build -t ghcr.io/luoda2023/LUODA-token:v1.0.0 .
 
       - name: Log in to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Push image
+      - name: Tag and push image
         run: |
-          echo "=== Pushing image now ==="
+          docker tag test-image:latest ghcr.io/luoda2023/LUODA-token:latest
+          docker tag test-image:latest ghcr.io/luoda2023/LUODA-token:v1.0.0
           docker push ghcr.io/luoda2023/LUODA-token:latest
           docker push ghcr.io/luoda2023/LUODA-token:v1.0.0
-          echo "=== Push complete ==="
-          
-      - name: Verify package exists
-        run: |
-          curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/users/luoda2023/packages?package_type=container" | \
-            jq '.[] | select(.name | test("LUODA-token"))'
