@@ -9,24 +9,17 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build Docker image
-        run: |
-          docker build --progress=plain -t test-image:latest . 2>&1 || true
-          docker build -t test-image:latest .
+      - name: Build
+        run: docker build -t myapp:latest .
 
-      - name: Log in to GHCR
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-      - name: Tag and push image
+      - name: Login GHCR
         run: |
-          docker tag test-image:latest ghcr.io/luoda2023/LUODA-token:latest
-          docker tag test-image:latest ghcr.io/luoda2023/LUODA-token:v1.0.0
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Push
+        run: |
+          docker tag myapp:latest ghcr.io/luoda2023/LUODA-token:latest
           docker push ghcr.io/luoda2023/LUODA-token:latest
-          docker push ghcr.io/luoda2023/LUODA-token:v1.0.0
