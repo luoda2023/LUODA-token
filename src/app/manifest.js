@@ -1,8 +1,8 @@
 export default function manifest() {
   return {
-    name: '9Router - AI Infrastructure Management',
-    short_name: '9Router',
-    description: 'One endpoint for all your AI providers. Manage keys, monitor usage, and scale effortlessly.',
+    name: 'LUODA-TOKEN - AI Infrastructure Management',
+    short_name: 'LUODA-TOKEN',
+    description: '统一的 AI 提供商接入端点，管理密钥，监控用量，轻松扩展。',
     start_url: '/',
     display: 'standalone',
     background_color: '#0a0a0a',
