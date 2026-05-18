@@ -1,104 +1,81 @@
 # Docker
 
-Run 9Router in a container. Published image: [`decolua/9router`](https://hub.docker.com/r/decolua/9router) — multi-platform `linux/amd64` + `linux/arm64`.
+Run LUODA-TOKEN in a container. Multi-platform `linux/amd64` + `linux/arm64`.
 
 ---
 
-# 👤 For Users
-
-## Quick start
+## 构建 Docker 镜像
 
 ```bash
+# 在项目根目录构建
+cd LUODA-token
+docker build -t luoda-token .
+
+# 运行
 docker run -d \
   -p 20128:20128 \
-  -v "$HOME/.9router:/app/data" \
+  -v ./data:/app/data \
   -e DATA_DIR=/app/data \
-  --name 9router \
-  decolua/9router:latest
+  -e JWT_SECRET=替换为随机密钥 \
+  -e INITIAL_PASSWORD=设置登录密码 \
+  --name luoda-token \
+  luoda-token:latest
+
+# 访问
+# http://localhost:20128
 ```
 
-App listens on port `20128`. Open: http://localhost:20128
+## 推送到 GitHub Container Registry
 
-## Manage container
+推送 git tag `v*` → GitHub Actions 自动构建并推送到 `ghcr.io/luoda2023/LUODA-token`。
 
 ```bash
-docker logs -f 9router        # view logs
-docker stop 9router           # stop
-docker start 9router          # start again
-docker rm -f 9router          # remove
+git tag v0.1.0 && git push origin v0.1.0
 ```
 
-## Data persistence
+镜像地址：`ghcr.io/luoda2023/LUODA-token:latest`
+
+## 1Panel 部署
+
+在 1Panel 的 **容器** → **编排** 中创建，使用 `ghcr.io/luoda2023/LUODA-token:latest` 镜像：
+
+```yaml
+version: "3.8"
+services:
+  luoda-token:
+    image: ghcr.io/luoda2023/LUODA-token:latest
+    container_name: luoda-token
+    restart: always
+    ports:
+      - "20128:20128"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DATA_DIR=/app/data
+      - JWT_SECRET=请替换为随机密钥
+      - INITIAL_PASSWORD=请设置你的登录密码
+      - PORT=20128
+```
+
+## 环境变量
+
+| 变量 | 说明 | 默认值 |
+|------|------|--------|
+| `JWT_SECRET` | JWT 签名密钥 | 必填 |
+| `INITIAL_PASSWORD` | 初始登录密码 | 必填 |
+| `PORT` | 服务端口 | `20128` |
+| `DATA_DIR` | 数据存储目录 | `/app/data` |
+
+## 容器管理
 
 ```bash
--v "$HOME/.9router:/app/data" \
--e DATA_DIR=/app/data
+docker logs -f luoda-token     # 查看日志
+docker restart luoda-token     # 重启
+docker stop luoda-token        # 停止
+docker rm -f luoda-token       # 删除
+
+# 更新到最新版
+docker pull ghcr.io/luoda2023/LUODA-token:latest
+docker rm -f luoda-token
+# 重新执行 docker run 命令
 ```
-
-Without `DATA_DIR`, the app falls back to `~/.9router/` (macOS/Linux) or `%APPDATA%\9router\` (Windows). In the container, `DATA_DIR=/app/data` makes the bind mount work.
-
-Data layout under `$DATA_DIR/`:
-
-```text
-$DATA_DIR/
-├── db/
-│   ├── data.sqlite       # main SQLite database
-│   └── backups/          # auto backups
-└── ...                   # certs, logs, runtime configs
-```
-
-Host path: `$HOME/.9router/db/data.sqlite`
-Container path: `/app/data/db/data.sqlite`
-
-## Optional env vars
-
-```bash
-docker run -d \
-  -p 20128:20128 \
-  -v "$HOME/.9router:/app/data" \
-  -e DATA_DIR=/app/data \
-  -e PORT=20128 \
-  -e HOSTNAME=0.0.0.0 \
-  -e DEBUG=true \
-  --name 9router \
-  decolua/9router:latest
-```
-
-## Update to latest
-
-```bash
-docker pull decolua/9router:latest
-docker rm -f 9router
-# re-run the quick start command
-```
-
----
-
-# 🛠 For Developers
-
-## Build image locally (test)
-
-```bash
-cd app && docker build -t 9router .
-
-docker run --rm -p 20128:20128 \
-  -v "$HOME/.9router:/app/data" \
-  -e DATA_DIR=/app/data \
-  9router
-```
-
-## Publish (automatic via CI)
-
-Push a git tag `v*` → GitHub Actions builds multi-platform (amd64+arm64) and pushes to:
-- `ghcr.io/decolua/9router:v{version}` + `:latest`
-- `decolua/9router:v{version}` + `:latest`
-
-```bash
-# Use scripts/release.js (recommended)
-node scripts/release.js "Release title" "Notes"
-
-# Or manually
-git tag v0.4.x && git push origin v0.4.x
-```
-
-Workflow: `app/.github/workflows/docker-publish.yml`
